@@ -1,4 +1,5 @@
 import express from "express";
-const app = express();
+import "./database/connection";
 
+const app = express();
 export default app;
