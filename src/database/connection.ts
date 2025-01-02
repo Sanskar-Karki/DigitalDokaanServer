@@ -1,19 +1,25 @@
 import { Sequelize } from "sequelize-typescript";
 import { envConfig } from "../config/config";
 
-const sequelize = new Sequelize(envConfig.connectionString as string);
+const sequelize = new Sequelize(envConfig.connectionString as string, {
+  models: [__dirname + "/models"],
+});
 
 try {
   sequelize
     .authenticate()
     .then(() => {
-      console.log("Authenticaiton Verified , SupaBase Connection Successful");
+      console.log("Connected !!! 😀");
     })
-    .catch((error) => {
-      console.log("Error ayo", error);
+    .catch((err) => {
+      console.log("ERROR 😝 : ", err);
     });
 } catch (error) {
   console.log(error);
 }
+
+sequelize.sync({ force: false }).then(() => {
+  console.log("synced !!");
+});
 
 export default sequelize;
