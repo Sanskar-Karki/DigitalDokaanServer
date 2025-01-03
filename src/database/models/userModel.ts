@@ -11,7 +11,6 @@ import {
   modelName: "User",
   timestamps: true,
 })
-
 class User extends Model {
   @Column({
     primaryKey: true,
@@ -41,4 +40,4 @@ class User extends Model {
   })
   declare role: string;
 }
-export default User
+export default User;
