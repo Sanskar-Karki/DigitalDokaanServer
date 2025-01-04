@@ -6,3 +6,4 @@ app.use(express.json());
 app.use("/api/auth", userRoute);
  
 export default app;
+  
