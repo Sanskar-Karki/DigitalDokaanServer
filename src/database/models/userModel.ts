@@ -48,6 +48,6 @@ class User extends Model {
   @Column({
     type: DataType.STRING,
   })
-  declare optGeneratedTime: string;
+  declare otpGeneratedTime: string;
 }
 export default User;
