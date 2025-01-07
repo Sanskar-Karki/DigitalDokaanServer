@@ -8,4 +8,7 @@ export const envConfig = {
   jwtExpiresIn: process.env.JWT_EXPIRES_IN,
   email: process.env.EMAIL,
   appPass: process.env.APP_PASS, 
+  adminEmail:process.env.ADMIN_EMAIL,
+  adminPassword:process.env.ADMIN_PASSWORD,
+  adminUsername:process.env.ADMIN_USERNAME,
 };

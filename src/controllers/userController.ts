@@ -18,6 +18,19 @@ class UserController {
         });
         return;
       }
+      // check wheather that email already exist
+      const [data] = await User.findAll({
+        where: {
+          email: email,
+        },
+      });
+      if (data) {
+        res.status(400).json({
+          message: "Please try again later !!!",
+          // Email already exist vanera message diyo vane hacker lai sajilo hunxa messge pauna ra brute force garna lai
+        });
+        return;
+      }
       // data --> users table ma insert garne
       await User.create({
         username,

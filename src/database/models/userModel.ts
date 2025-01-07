@@ -3,7 +3,6 @@ import {
   Column,
   Model,
   DataType,
-  PrimaryKey,
 } from "sequelize-typescript";
 
 @Table({
@@ -11,6 +10,7 @@ import {
   modelName: "User",
   timestamps: true,
 })
+
 class User extends Model {
   @Column({
     primaryKey: true,
