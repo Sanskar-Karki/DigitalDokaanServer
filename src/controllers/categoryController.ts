@@ -32,8 +32,10 @@ class CategoryController {
     }
   }
   async addCategory(req: Request, res: Response): Promise<void> {
+    // login xa ki xaina check garna paryo ra
+    // admin ho ki haina check garne before letting to add Category
     //@ts-ignore
-    console.log(req.userId);
+    console.log(req.user);
     const { categoryName } = req.body;
     if (!categoryName) {
       res.status(400).json({
