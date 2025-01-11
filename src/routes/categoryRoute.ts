@@ -10,7 +10,7 @@ router
   .get(categoryController.getCategory)
   .post(
     userMiddleware.isUserLoggedIn,
-    userMiddleware.restrictTo(Role.Admin),
+    userMiddleware.accessTo(Role.Admin),
     categoryController.addCategory
   );
 
@@ -18,7 +18,10 @@ router
 
 router
   .route("/:id")
-  .patch(categoryController.updateCategory)
-  .delete(categoryController.deleteCategory);
+  .patch(userMiddleware.accessTo(Role.Admin), categoryController.updateCategory)
+  .delete(
+    userMiddleware.accessTo(Role.Admin),
+    categoryController.deleteCategory
+  );
 
 export default router;

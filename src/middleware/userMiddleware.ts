@@ -58,9 +58,17 @@ class UserMiddleware {
     );
   }
 
-  restrictTo(...roles: Role[]) {
+  // category add admin le matra garna parunu paryo customer ley paunu vayena
+  accessTo(...roles: Role[]) {
     return (req: IExtendedRequest, res: Response, next: NextFunction) => {
       let userRole = req.user?.role as Role;
+      if (!roles.includes(userRole)) {
+        res.status(403).json({
+          message: "Customers dont have authority to add Category",
+        });
+        return;
+      }
+      next();
       console.log(userRole, "Role");
     };
   }
