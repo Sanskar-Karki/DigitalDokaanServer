@@ -20,6 +20,7 @@ router
   .route("/:id")
   .patch(userMiddleware.accessTo(Role.Admin), categoryController.updateCategory)
   .delete(
+    userMiddleware.isUserLoggedIn,
     userMiddleware.accessTo(Role.Admin),
     categoryController.deleteCategory
   );

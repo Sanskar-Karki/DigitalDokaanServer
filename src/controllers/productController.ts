@@ -2,48 +2,50 @@ import { Request, Response } from "express";
 import Product from "../database/models/productModel";
 import Category from "../database/models/categoryModel";
 
-interface ProductRequest extends Request {
-  file?: {
-    filename: string;
-  };
-}
 class ProductConroller {
-  async createProduct(req: ProductRequest, res: Response): Promise<void> {
-    const {
-      productName,
-      productDescription,
-      productPrice,
-      productTotalStock,
-      discount,
-      categoryId,
-    } = req.body;
-    const filename = req.file
-      ? req.file.filename
-      : "https://ragnorhydraulics.com/wp-content/uploads/2024/07/Default-Product-Images.png";
-    if (
-      !productName ||
-      !productDescription ||
-      !productPrice ||
-      !productTotalStock ||
-      !categoryId
-    ) {
-      res.status(400).json({
-        message: "Please provide all the information",
+  async createProduct(req: Request, res: Response): Promise<void> {
+    try {
+      const {
+        productName,
+        productDescription,
+        productPrice,
+        productTotalStock,
+        discount,
+        categoryId,
+      } = req.body;
+      console.log(req.file);
+      const filename = req.file
+        ? req.file.filename
+        : "https://ragnorhydraulics.com/wp-content/uploads/2024/07/Default-Product-Images.png";
+      if (
+        !productName ||
+        !productDescription ||
+        !productPrice ||
+        !productTotalStock ||
+        !categoryId
+      ) {
+        res.status(400).json({
+          message: "Please provide all the information",
+        });
+        return;
+      }
+      await Product.create({
+        productName,
+        productDescription,
+        productPrice,
+        productTotalStock,
+        discount: discount || 0,
+        categoryId,
+        productImageUrl: filename,
       });
-      return;
+      res.status(200).json({
+        message: "Product created Successfully",
+      });
+    } catch (error) {
+      res.status(400).json({
+        message: `Error during production creation, ${error}`,
+      });
     }
-    await Product.create({
-      productName,
-      productDescription,
-      productPrice,
-      productTotalStock,
-      discount: discount || 0,
-      categoryId,
-      productImageUrl: filename,
-    });
-    res.status(200).json({
-      message: "Product created Successfully",
-    });
   }
   async getAllProduct(req: Request, res: Response): Promise<void> {
     // category id thorugh name dekhauna parxa so id lai join garauna parxa
@@ -52,6 +54,7 @@ class ProductConroller {
       include: [
         {
           model: Category,
+          attributes: ["id", "categoryName"],
         },
       ],
     });
@@ -69,6 +72,7 @@ class ProductConroller {
       include: [
         {
           model: Category,
+          attributes: ["id", "categoryName"],
         },
       ],
     });

@@ -64,7 +64,7 @@ class UserMiddleware {
       let userRole = req.user?.role as Role;
       if (!roles.includes(userRole)) {
         res.status(403).json({
-          message: "Customers dont have authority to add Category",
+          message: "Customers dont have authority to add/delete Category",
         });
         return;
       }

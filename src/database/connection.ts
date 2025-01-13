@@ -21,12 +21,12 @@ try {
 }
 
 // realtionships
-// product table ma category id 
-Product.belongsTo(Category);
-Category.hasOne(Product);
+// product table ma category id
+Product.belongsTo(Category, { foreignKey: "categoryId" });
+Category.hasOne(Product, { foreignKey: "categoryId" });
 
 // database synchronization
-sequelize.sync({ force: false, alter: true }).then(() => {
+sequelize.sync({ force: false, alter: false }).then(() => {
   console.log("synced !!");
 });
 

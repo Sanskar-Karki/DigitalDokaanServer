@@ -41,9 +41,9 @@ class Product extends Model {
   declare discount: string;
 
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.TEXT,
   })
   declare productImageUrl: string;
 }
-                                    
+
 export default Product;
