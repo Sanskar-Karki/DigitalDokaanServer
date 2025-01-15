@@ -4,48 +4,42 @@ import Category from "../database/models/categoryModel";
 
 class ProductConroller {
   async createProduct(req: Request, res: Response): Promise<void> {
-    try {
-      const {
-        productName,
-        productDescription,
-        productPrice,
-        productTotalStock,
-        discount,
-        categoryId,
-      } = req.body;
-      console.log(req.file);
-      const filename = req.file
-        ? req.file.filename
-        : "https://ragnorhydraulics.com/wp-content/uploads/2024/07/Default-Product-Images.png";
-      if (
-        !productName ||
-        !productDescription ||
-        !productPrice ||
-        !productTotalStock ||
-        !categoryId
-      ) {
-        res.status(400).json({
-          message: "Please provide all the information",
-        });
-        return;
-      }
-      await Product.create({
-        productName,
-        productDescription,
-        productPrice,
-        productTotalStock,
-        discount: discount || 0,
-        categoryId,
-        productImageUrl: filename,
-      });
-      res.status(200).json({
-        message: "Product created Successfully",
-      });
-    } catch (error) {
+    const {
+      productName,
+      productDescription,
+      productPrice,
+      productTotalStock,
+      discount,
+      categoryId,
+    } = req.body;
+    console.log(req.file);
+    const filename = req.file
+      ? req.file.filename
+      : "https://ragnorhydraulics.com/wp-content/uploads/2024/07/Default-Product-Images.png";
+    if (
+      !productName ||
+      !productDescription ||
+      !productPrice ||
+      !productTotalStock ||
+      !categoryId
+    ) {
       res.status(400).json({
-        message: `Error during production creation, ${error}`,
+        message: "Please provide all the information",
       });
+      return;
     }
+    await Product.create({
+      productName,
+      productDescription,
+      productPrice,
+      productTotalStock,
+      discount: discount || 0,
+      categoryId,
+      productImageUrl: filename,
+    });
+    res.status(200).json({
+      message: "Product created Successfully",
+    });
   }
   async getAllProduct(req: Request, res: Response): Promise<void> {
     // category id thorugh name dekhauna parxa so id lai join garauna parxa
