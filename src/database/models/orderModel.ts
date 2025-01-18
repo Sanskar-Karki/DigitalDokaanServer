@@ -30,7 +30,7 @@ class Order extends Model {
     type: DataType.STRING,
     allowNull: false,
   })
-  declare shippingAdress: string;
+  declare shippingAddress: string;
 
   @Column({
     type: DataType.FLOAT,
