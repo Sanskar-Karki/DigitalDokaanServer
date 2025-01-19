@@ -4,7 +4,7 @@ import Order from "../database/models/orderModel";
 import OrderDetails from "../database/models/orderDetailsModel";
 import { PaymentMethod } from "../globals/types";
 import Payment from "../database/models/paymentModel";
-
+import axios from "axios";
 interface IProduct {
   productId: string;
   productQty: string;
@@ -52,13 +52,37 @@ class OrderController {
       });
     });
     // for payment Model
-    if (paymentMethod == PaymentMethod.COD) {
-      await Payment.create({
-        orderId: orderData.id,
-        PaymentMethod,
-      });
-    } else if (paymentMethod == PaymentMethod.Khalti) {
+    let paymentData = await Payment.create({
+      orderId: orderData.id,
+      PaymentMethod,
+    });
+    if (paymentMethod == PaymentMethod.Khalti) {
       // khalti integration logic
+      const data = {
+        return_url: "https://localhost:5173/",
+        website_url: "https://localhost:5173/",
+        amount: totalAmount * 100, // paisa ma dinu parxa 100 paisa = 1 rupya
+        purchase_order_id: orderData.id,
+        purchase_order_name: "order_" + orderData.id,
+      };
+      const response = await axios.post(
+        "https://dev.khalti.com/api/v2/epayment/initiate/",
+        data,
+        {
+          headers: {
+            Authorization: "Key 02ada457127d4b7f9a869bf107094c9d",
+          },
+        }
+      );
+      // gives pidx transaction id in data object
+      const khaltiResponse = response.data;
+      paymentData.pidx = khaltiResponse.pidx;
+      paymentData.save();
+      console.log(khaltiResponse);
+      res.status(200).json({
+        message: "Order created successfully",
+        url: khaltiResponse.payment_url,
+      });
     } else {
       // esewa integration logic
     }
