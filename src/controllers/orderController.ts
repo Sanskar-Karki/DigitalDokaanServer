@@ -2,7 +2,11 @@ import { Request, Response } from "express";
 import sendResponse from "../services/sendResponse";
 import Order from "../database/models/orderModel";
 import OrderDetails from "../database/models/orderDetailsModel";
-import { PaymentMethod } from "../globals/types";
+import {
+  PaymentMethod,
+  PaymentStatus,
+  TransactionStatus,
+} from "../globals/types";
 import Payment from "../database/models/paymentModel";
 import axios from "axios";
 interface IProduct {
@@ -54,7 +58,7 @@ class OrderController {
     // for payment Model
     let paymentData = await Payment.create({
       orderId: orderData.id,
-      PaymentMethod,
+      paymentMethod,
     });
     if (paymentMethod == PaymentMethod.Khalti) {
       // khalti integration logic
@@ -66,7 +70,7 @@ class OrderController {
         purchase_order_name: "order_" + orderData.id,
       };
       const response = await axios.post(
-        "https://dev.khalti.com/api/v2/epayment/initiate/",
+        "https://a.khalti.com/api/v2/epayment/initiate/",
         data,
         {
           headers: {
@@ -74,21 +78,60 @@ class OrderController {
           },
         }
       );
-      // gives pidx transaction id in data object
+      // gives pidx transaction id in response.data object
       const khaltiResponse = response.data;
       paymentData.pidx = khaltiResponse.pidx;
       paymentData.save();
-      console.log(khaltiResponse);
       res.status(200).json({
         message: "Order created successfully",
         url: khaltiResponse.payment_url,
+        pidx: khaltiResponse.pidx,
       });
+      return;
     } else {
       // esewa integration logic
     }
     res.status(200).json({
       message: "Order created successfully",
     });
+  }
+
+  async verifyTransaction(req: OrderRequest, res: Response): Promise<void> {
+    const { pidx } = req.body;
+    if (!pidx) {
+      res.status(400).json({
+        message: "Please provide pidx",
+      });
+      return;
+    }
+
+    const response = await axios.post(
+      "https://a.khalti.com/api/v2/epayment/lookup/",
+      { pidx },
+      {
+        headers: {
+          Authorization: "Key 02ada457127d4b7f9a869bf107094c9d",
+        },
+      }
+    );
+
+    const data = response.data;
+    if (data.status === "Completed") {
+      await Payment.update(
+        { paymentStatus: PaymentStatus.Paid },
+        { where: { pidx } }
+      );
+
+      res.status(200).json({
+        message: "Payment verified successfully!",
+      });
+      return;
+    } else {
+      res.status(400).json({
+        message: "Payment not verified or cancelled",
+      });
+      return;
+    }
   }
 }
 
@@ -100,11 +143,12 @@ export default new OrderController();
     phoneNumber : 912323, 
     totalAmount : 1232, 
     products : [{
- productId : 89123123, 
- qty : 2 
-},
- {productId : 123123, 
- qty : 1
-}]
-}
+        productId : 89123123, 
+        productQty : 2 
+      },
+      {
+        productId : 123123, 
+        productQty : 1
+      }]
+      }
 */

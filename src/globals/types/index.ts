@@ -16,3 +16,12 @@ export enum PaymentStatus {
   Paid = "paid",
   Unpaid = "unpaid",
 }
+export enum TransactionStatus {
+  Pending = "Pending",
+  Completed = "Completed",
+  Expired = "Expired",
+  Initiated = "Initiated",
+  PartiallyRefunded = "Partially Refunded",
+  UserCanceled = "User canceled",
+  Refunded = "Refunded",
+}
