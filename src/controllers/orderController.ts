@@ -88,12 +88,13 @@ class OrderController {
         pidx: khaltiResponse.pidx,
       });
       return;
+    } else if (paymentMethod == PaymentMethod.Esewa) {
+      // Esewa Logic
     } else {
-      // esewa integration logic
+      res.status(200).json({
+        message: "Order created successfully",
+      });
     }
-    res.status(200).json({
-      message: "Order created successfully",
-    });
   }
 
   async verifyTransaction(req: OrderRequest, res: Response): Promise<void> {
