@@ -9,36 +9,41 @@ import {
 } from "../globals/types";
 import Payment from "../database/models/paymentModel";
 import axios from "axios";
+
 interface IProduct {
   productId: string;
   productQty: string;
 }
+
 interface OrderRequest extends Request {
   user?: {
     id: string;
   };
 }
+
 class OrderController {
   async createOrder(req: OrderRequest, res: Response): Promise<void> {
     const userId = req.user?.id;
     const { phoneNumber, shippingAddress, totalAmount, paymentMethod } =
       req.body;
     const products: IProduct[] = req.body.products;
+
+    // Validate request data
     if (
       !phoneNumber ||
       !shippingAddress ||
       !totalAmount ||
-      products.length == 0
+      products.length === 0
     ) {
       sendResponse(
         res,
         400,
-        "Please provide all the information before Creating an Order"
+        "Please provide all the information before creating an order"
       );
       return;
     }
 
-    // for order Model
+    // Create order
     const orderData = await Order.create({
       phoneNumber,
       shippingAddress,
@@ -46,29 +51,31 @@ class OrderController {
       userId,
     });
 
-    // for orderDtails Model
-
-    products.forEach(async function (product) {
+    // Create order details for each product
+    for (const product of products) {
       await OrderDetails.create({
         quantity: product.productQty,
         productId: product.productId,
         orderId: orderData.id,
       });
-    });
-    // for payment Model
+    }
+
+    // Create payment entry
     let paymentData = await Payment.create({
       orderId: orderData.id,
       paymentMethod,
     });
-    if (paymentMethod == PaymentMethod.Khalti) {
-      // khalti integration logic
+
+    if (paymentMethod === PaymentMethod.Khalti) {
+      // Khalti integration logic
       const data = {
         return_url: "https://localhost:5173/",
         website_url: "https://localhost:5173/",
-        amount: totalAmount * 100, // paisa ma dinu parxa 100 paisa = 1 rupya
+        amount: totalAmount * 100, // Convert to paisa (1 rupee = 100 paisa)
         purchase_order_id: orderData.id,
         purchase_order_name: "order_" + orderData.id,
       };
+
       const response = await axios.post(
         "https://a.khalti.com/api/v2/epayment/initiate/",
         data,
@@ -78,18 +85,20 @@ class OrderController {
           },
         }
       );
-      // gives pidx transaction id in response.data object
+
+      // Update payment data with Khalti response
       const khaltiResponse = response.data;
       paymentData.pidx = khaltiResponse.pidx;
-      paymentData.save();
+      await paymentData.save();
+
       res.status(200).json({
         message: "Order created successfully",
         url: khaltiResponse.payment_url,
         pidx: khaltiResponse.pidx,
       });
       return;
-    } else if (paymentMethod == PaymentMethod.Esewa) {
-      // Esewa Logic
+    } else if (paymentMethod === PaymentMethod.Esewa) {
+      // Esewa integration logic (to be implemented)
     } else {
       res.status(200).json({
         message: "Order created successfully",
@@ -99,6 +108,8 @@ class OrderController {
 
   async verifyTransaction(req: OrderRequest, res: Response): Promise<void> {
     const { pidx } = req.body;
+
+    // Validate pidx
     if (!pidx) {
       res.status(400).json({
         message: "Please provide pidx",
@@ -126,30 +137,30 @@ class OrderController {
       res.status(200).json({
         message: "Payment verified successfully!",
       });
-      return;
     } else {
       res.status(400).json({
         message: "Payment not verified or cancelled",
       });
-      return;
     }
   }
 }
 
 export default new OrderController();
 
-/* 
-{  
-    shippingAddress : "Itahari", 
-    phoneNumber : 912323, 
-    totalAmount : 1232, 
-    products : [{
-        productId : 89123123, 
-        productQty : 2 
-      },
-      {
-        productId : 123123, 
-        productQty : 1
-      }]
-      }
+/* Example Request Body:
+{
+  shippingAddress: "Itahari",
+  phoneNumber: 912323,
+  totalAmount: 1232,
+  products: [
+    {
+      productId: 89123123,
+      productQty: 2,
+    },
+    {
+      productId: 123123,
+      productQty: 1,
+    },
+  ],
+}
 */
