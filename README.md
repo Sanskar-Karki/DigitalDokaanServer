@@ -14,7 +14,7 @@ Digital Dokaan is an online platform that helps you manage, see, and track your 
 👉 **Inventory Management:** Keep track of product availability and stock levels.  
 👉 **Customer Orders:** Manage and view customer orders and their statuses.  
 👉 **Visualize Trends:** View sales and inventory data with easy-to-read graphs and charts.  
-  ![Sales Trend Chart](https://via.placeholder.com/500x300)
+
 
 ---
 
