@@ -54,7 +54,7 @@ Digital Dokaan is an online platform that helps you manage, see, and track your 
 🔹 Social sharing and reviews for products  
 🔹 Mobile app version  
 
-🚧 Project Update
+## 🚧 Project Update
 Backend Code: The backend code is completed and fully functional.
 Frontend Code: The frontend code is in progress and will be actively developed soon.
 
